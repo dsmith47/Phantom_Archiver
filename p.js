@@ -11,7 +11,7 @@ if (system.args.length > 1){
 
 
 //Saves the given image as a png
-function saveToImage(url, fname){
+function saveToImage(url){
   page=require("webpage").create();
   page.onConsoleMessage = function(msg){
     console.log(msg);
@@ -24,11 +24,14 @@ function saveToImage(url, fname){
     };
     var status; 
     return page.open(url, function(status){
-      var file = fname;
+      var file = url+".png";
       if (status === "success" ){
         window.setTimeout( (function(){
           page.render(file);
-          phantom.exit();
+          branches = page.evaluate(search,url);
+          for (i in branches){
+            console.log(branches[i]);
+          }
         }), 200 );  
       }
     });
@@ -39,36 +42,24 @@ function saveToImage(url, fname){
 
 
 
-function search(url){
-  page=require("webpage").create();
-  page.onConsoleMessage = function(msg){
-    console.log(msg);
-  }
 
 
-  access = function(){
-    return page.open(url, function(status){
-      console.log(status);
-      if(status === "success"){
-        page.evaluate(function(path){
-          console.log(path);
-          var as = document.getElementsByTagName("a");
-          for( a in as ){
-            if( !(String(as[a]).search(path)) ){
-              console.log( String( as[a] ) );
-            }
-          }
-        },url);
+var search = function(path){
+  var out = [];
+  console.log("SEARCH FUNC");
+  var as = document.getElementsByTagName("a");
+  for( a in as ){
+    if( typeof(as[a]) == 'object' ){
+      var new_url = String(as[a].getAttribute('href') );
+      if( new_url != "/" && ( new_url.lastIndexOf("http")!=0 ) ){
+        out.push( new_url );
       }
-    });
+    }
   }
-
-  access();
+  return out;
 }
 
+//MAIN execution ///////////////////////////////////////////////////////////////
 
-
-//saveToImage(adr,"test.png");
-search(adr);
-
+saveToImage(adr);
 
