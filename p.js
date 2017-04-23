@@ -24,13 +24,14 @@ function saveToImage(url){
     };
     var status; 
     return page.open(url, function(status){
-      var file = url+".png";
+      var file = url+"page.png";
       if (status === "success" ){
         window.setTimeout( (function(){
           page.render(file);
           branches = page.evaluate(search,url);
           for (i in branches){
             console.log(branches[i]);
+            saveToImage(url+branches[i]);
           }
         }), 200 );  
       }
