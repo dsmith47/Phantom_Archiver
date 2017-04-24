@@ -8,5 +8,5 @@ Install
   npm install phantomjs
 
 Usage:
-  phantomjs p.js
+  phantomjs render.js [urls_to_crawl]
 
