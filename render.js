@@ -2,7 +2,7 @@
 
 "use strict";
 var RenderUrlsToFile, arrayOfUrls, system;
-
+var base
 system = require("system");
 
 /*
@@ -12,11 +12,15 @@ Render given urls
 @param callbackFinal Function called after finishing everything
 */
 RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
-    var getFilename, next, page, retrieve, urlIndex, webpage;
+    var getFilename, next, page, retrieve, urlIndex, getBase, webpage;
     var visited = {};
     urlIndex = 0;
     webpage = require("webpage");
     page = null;
+
+    getBase = function(){
+      return base;
+    }
     
     next = function(status, url, file) {
         page.close();
@@ -36,9 +40,9 @@ RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
                 height: 600
             };
             page.settings.userAgent = "Phantom.js bot";
-            return page.open("http://" + url, function(status) {
+            return page.open("http://" + getBase() + url, function(status) {
                 var file;
-                file = url+'page.png';
+                file = getBase() + url+'page.png';
                 console.log(file);
                 if (status === "success") {
                     console.log(urls);
@@ -64,7 +68,7 @@ RenderUrlsToFile = function(urls, callbackPerUrl, callbackFinal) {
                       if( !visited[new_urls[i]] ){
                         console.log( url+new_urls[i] );
                         visited[new_urls[i]] = true;
-                        urls.push( url+new_urls[i] );
+                        urls.push( new_urls[i] );
                       }
                     }
                     return window.setTimeout((function() {
@@ -86,6 +90,8 @@ arrayOfUrls = null;
 
 if (system.args.length > 1) {
     arrayOfUrls = Array.prototype.slice.call(system.args, 1);
+    base = arrayOfUrls[0];
+    arrayOfUrls[0] = "";
 } else {
     console.log("Usage: phantomjs render_multi_url.js [domain.name1, domain.name2, ...]");
 }
